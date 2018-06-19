@@ -9,7 +9,6 @@ jobs:
       - checkout
 
       - run: npm install
-      - run: npm i -g apollo
       - run: npm run test:setup
       - run: npm test
 
@@ -21,12 +20,12 @@ jobs:
           background: true
 
       # this assumes that ENGINE_API_KEY is set in the environment variables
-      - run: apollo schema:check --endpoint=http://localhost:3010/graphql
+      - run: npx apollo schema:check --endpoint=http://localhost:3010/graphql
 
       # this command will publish the latest version of the schema
       # to Engine but only on the master branch
       - run:
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              apollo schema:publish --endpoint=http://localhost:3010/graphql
+              npx apollo schema:publish --endpoint=http://localhost:3010/graphql
             fi

@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/apollostack/GitHunt#readme",
   "devDependencies": {
-    "apollo": "^1.0.0",
+    "apollo": "^1.0.2",
     "babel-eslint": "8.2.1",
     "babel-jest": "^22.1.0",
     "casual": "^1.5.19",
