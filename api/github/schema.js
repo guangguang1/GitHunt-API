@@ -1,4 +1,4 @@
-import { property } from 'lodash';
+import { property } from "lodash";
 
 export const schema = [
   `
@@ -24,7 +24,7 @@ type Repository @cacheControl(maxAge:240){
   open_issues_count: Int
 
   # The owner of this repository on GitHub, e.g. apollostack
-  owner: User!
+  # owner: User
 }
 
 # A user object from the GitHub API. This uses the exact field names returned from the GitHub API.
@@ -43,6 +43,6 @@ type User @cacheControl(maxAge:240){
 
 export const resolvers = {
   Repository: {
-    owner: property('owner'),
+    // owner: property("owner"),
   },
 };
