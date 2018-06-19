@@ -1,6 +1,7 @@
-import { property } from 'lodash';
+import { property } from "lodash";
 
-export const schema = [`
+export const schema = [
+  `
 # A repository object from the GitHub API. This uses the exact field names returned by the
 # GitHub API for simplicity, even though the convention for GraphQL is usually to camel case.
 type Repository @cacheControl(maxAge:240){
@@ -23,7 +24,7 @@ type Repository @cacheControl(maxAge:240){
   open_issues_count: Int
 
   # The owner of this repository on GitHub, e.g. apollostack
-  owner: User
+  owner: User!
 }
 
 # A user object from the GitHub API. This uses the exact field names returned from the GitHub API.
@@ -37,10 +38,11 @@ type User @cacheControl(maxAge:240){
   # The URL of this user's GitHub page
   html_url: String!
 }
-`];
+`,
+];
 
 export const resolvers = {
   Repository: {
-    owner: property('owner'),
+    owner: property("owner"),
   },
 };
