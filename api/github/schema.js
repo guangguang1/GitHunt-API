@@ -1,4 +1,4 @@
-import { property } from "lodash";
+import { property } from 'lodash';
 
 export const schema = [
   `
@@ -43,6 +43,6 @@ type User @cacheControl(maxAge:240){
 
 export const resolvers = {
   Repository: {
-    owner: property("owner"),
+    owner: property('owner'),
   },
 };
