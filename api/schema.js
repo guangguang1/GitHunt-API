@@ -2,11 +2,15 @@ import { merge } from 'lodash';
 import { makeExecutableSchema } from 'graphql-tools';
 import { withFilter } from 'graphql-subscriptions';
 
-import { schema as gitHubSchema, resolvers as gitHubResolvers } from './github/schema';
+import {
+  schema as gitHubSchema,
+  resolvers as gitHubResolvers,
+} from './github/schema';
 import { schema as sqlSchema, resolvers as sqlResolvers } from './sql/schema';
 import { pubsub } from './subscriptions';
 
-const rootSchema = [`
+const rootSchema = [
+  `
 
 # A list of options for the sort order of the feed
 enum FeedType {
@@ -20,16 +24,15 @@ enum FeedType {
   TOP
 }
 
+input Offset {
+  start: Int
+  end: Int
+}
+
 type Query {
-  # A feed of repository submissions
   feed(
-    # The sort order for the feed
     type: FeedType!,
-
-    # The number of items to skip, for pagination
-    offset: Int,
-
-    # The number of items to fetch starting from the offset, for pagination
+    offset: Offset,
     limit: Int
   ): [Entry]
 
@@ -87,7 +90,8 @@ schema {
   subscription: Subscription
 }
 
-`];
+`,
+];
 
 const COMMENT_ADDED_TOPIC = 'commentAdded';
 
@@ -96,7 +100,7 @@ const rootResolvers = {
     feed(root, { type, offset, limit }, context, { cacheControl }) {
       // Ensure API consumer can only fetch 20 items at most
       cacheControl.setCacheHint({ maxAge: 60 });
-      const protectedLimit = (limit < 1 || limit > 20) ? 20 : limit;
+      const protectedLimit = limit < 1 || limit > 20 ? 20 : limit;
 
       return context.Entries.getForFeed(type, offset, protectedLimit);
     },
@@ -116,25 +120,20 @@ const rootResolvers = {
       }
 
       return Promise.resolve()
-        .then(() => (
-          context.Repositories.getByFullName(repoFullName)
-            .then((res) => {
-              if (!res) {
-                throw new Error(`Couldn't find repository named "${repoFullName}"`);
-              }
-            })
-        ))
-        .then(() => (
-          context.Entries.getByRepoFullName(repoFullName)
-            .then((res) => {
-              if (res) {
-                throw new Error('This repository has already been added.');
-              }
-            })
-        ))
-        .then(() => (
-          context.Entries.submitRepository(repoFullName, context.user.login)
-        ))
+        .then(() =>
+          context.Repositories.getByFullName(repoFullName).then((res) => {
+            if (!res) {
+              throw new Error(`Couldn't find repository named "${repoFullName}"`);
+            }
+          }))
+        .then(() =>
+          context.Entries.getByRepoFullName(repoFullName).then((res) => {
+            if (res) {
+              throw new Error('This repository has already been added.');
+            }
+          }))
+        .then(() =>
+          context.Entries.submitRepository(repoFullName, context.user.login))
         .then(() => context.Entries.getByRepoFullName(repoFullName));
     },
 
@@ -143,13 +142,12 @@ const rootResolvers = {
         throw new Error('Must be logged in to submit a comment.');
       }
       return Promise.resolve()
-        .then(() => (
+        .then(() =>
           context.Comments.submitComment(
             repoFullName,
             context.user.login,
             commentContent,
-          )
-        ))
+          ))
         .then(([id]) => context.Comments.getCommentById(id))
         .then((comment) => {
           // publish subscription notification
@@ -174,16 +172,17 @@ const rootResolvers = {
         repoFullName,
         voteValue,
         context.user.login,
-      ).then(() => (
-        context.Entries.getByRepoFullName(repoFullName)
-      ));
+      ).then(() => context.Entries.getByRepoFullName(repoFullName));
     },
   },
   Subscription: {
     commentAdded: {
-      subscribe: withFilter(() => pubsub.asyncIterator(COMMENT_ADDED_TOPIC), (payload, args) => {
-        return payload.commentAdded.repository_name === args.repoFullName;
-      }),
+      subscribe: withFilter(
+        () => pubsub.asyncIterator(COMMENT_ADDED_TOPIC),
+        (payload, args) => {
+          return payload.commentAdded.repository_name === args.repoFullName;
+        },
+      ),
     },
   },
 };
