@@ -25,6 +25,13 @@ type Repository @cacheControl(maxAge:240){
 
   # The owner of this repository on GitHub, e.g. apollostack
   # owner: User
+  owners: [User]
+}
+
+type Commit {
+  sha: ID!
+  commiter: User
+  date: String
 }
 
 # A user object from the GitHub API. This uses the exact field names returned from the GitHub API.
