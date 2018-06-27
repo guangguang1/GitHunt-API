@@ -1,6 +1,7 @@
 // import { property } from 'lodash';
 
 export const schema = [
+  
   `
 # A repository object from the GitHub API. This uses the exact field names returned by the
 # GitHub API for simplicity, even though the convention for GraphQL is usually to camel case.
