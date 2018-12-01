@@ -1,4 +1,6 @@
-# GitHunt
+# [DEPRECATED] GitHunt
+
+> **Please note:** This project is no longer maintained. For an up to date example of modern day Apollo usage, please refer to the [Apollo fullstack tutorial](https://github.com/apollographql/fullstack-tutorial).
 
 The Apollo Server backend shared by all Apollo client example apps.
 
